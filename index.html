@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Returning to SocialBridge…</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body {
+    font-family: -apple-system, Roboto, Arial, sans-serif;
+    background: #F5F3FC;
+    color: #1B1B23;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+  }
+  .box { max-width: 320px; padding: 24px; }
+  a.button {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 12px 24px;
+    background: #4C3BCF;
+    color: #fff;
+    border-radius: 24px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+  <div class="box">
+    <p>Finishing sign-in…</p>
+    <a class="button" id="returnLink" href="#">Return to the app</a>
+  </div>
+
+<script>
+  // This page's ONLY job: it exists at a real https:// URL so Facebook/Instagram, X,
+  // and LinkedIn are all willing to redirect here (none of them accept a bare custom
+  // scheme like "socialbridge://oauth" as a registered redirect URI anymore). It then
+  // immediately forwards whatever they sent straight into the app.
+  //
+  // Facebook/Instagram's implicit-grant login puts the token in the URL FRAGMENT
+  // (#access_token=...). X and LinkedIn's authorization-code flow put the code in the
+  // QUERY STRING (?code=...). Whichever one is present, forward it untouched.
+  var suffix = (window.location.hash && window.location.hash.length > 1)
+      ? window.location.hash
+      : window.location.search;
+
+  var appUrl = "socialbridge://oauth" + suffix;
+
+  var link = document.getElementById("returnLink");
+  link.href = appUrl;
+
+  // Try to jump back automatically. Some browsers require an actual tap before they'll
+  // navigate to a custom scheme — that's exactly why the visible button above exists too,
+  // as a fallback if the automatic redirect doesn't fire.
+  window.location.replace(appUrl);
+</script>
+</body>
+</html>
