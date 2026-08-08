@@ -36,26 +36,27 @@
   </div>
 
 <script>
-  // This page's ONLY job: it exists at a real https:// URL so Facebook/Instagram, X,
-  // and LinkedIn are all willing to redirect here (none of them accept a bare custom
-  // scheme like "socialbridge://oauth" as a registered redirect URI anymore). It then
-  // immediately forwards whatever they sent straight into the app.
-  //
-  // Facebook/Instagram's implicit-grant login puts the token in the URL FRAGMENT
-  // (#access_token=...). X and LinkedIn's authorization-code flow put the code in the
-  // QUERY STRING (?code=...). Whichever one is present, forward it untouched.
-  var suffix = (window.location.hash && window.location.hash.length > 1)
-      ? window.location.hash
-      : window.location.search;
+  function hasOAuthParams(str) {
+    return /[?#&](code|access_token|error)=/.test(str);
+  }
+
+  var hash = window.location.hash || "";
+  var search = window.location.search || "";
+
+  var suffix;
+  if (hasOAuthParams(search)) {
+    suffix = search;
+  } else if (hasOAuthParams(hash)) {
+    suffix = hash;
+  } else {
+    suffix = search || hash;
+  }
 
   var appUrl = "socialbridge://oauth" + suffix;
 
   var link = document.getElementById("returnLink");
   link.href = appUrl;
 
-  // Try to jump back automatically. Some browsers require an actual tap before they'll
-  // navigate to a custom scheme — that's exactly why the visible button above exists too,
-  // as a fallback if the automatic redirect doesn't fire.
   window.location.replace(appUrl);
 </script>
 </body>
